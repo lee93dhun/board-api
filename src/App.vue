@@ -20,7 +20,7 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 
-  width: 1200px;
+  width: 1100px;
   margin: 0 auto;
 }
 </style>

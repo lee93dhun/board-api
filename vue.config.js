@@ -4,5 +4,6 @@ module.exports = defineConfig({
   devServer:{
     port: 8080,
     historyApiFallback: true, 
-  }
+  },
+  publicPath:'/board-api/' 
 })

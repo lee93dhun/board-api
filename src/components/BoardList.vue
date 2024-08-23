@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>게시판 - 리스트</h1>
+    <h2>게시판 - 리스트</h2>
     <div class="search-filter">
       <label>등록일</label>
       <input type="date" v-model="respData.boardFilterVO.startDate" name="startDate"/> - 
@@ -16,13 +16,13 @@
     <div class="board-list">
       <table>
         <colgroup>
-          <col style="width: 150px">
-          <col style="width:75px">
-          <col style="width:350px">
-          <col style="width:130px">
-          <col style="width:90px">
-          <col style="width:200px">
-          <col style="width:200px">
+          <col style="width: 15%">
+          <col style="width: 5%">
+          <col style="width: 30%">
+          <col style="width: 10%">
+          <col style="width: 10%">
+          <col style="width: 15%">
+          <col style="width: 15%">
         </colgroup>
         <tr>
           <th>카테고리</th>
@@ -33,12 +33,14 @@
           <th>등록일시</th>
           <th>수정일시</th>
         </tr>
-        <tr v-for="post in respData.boardListByFilter" :key="post.id">
+        <tr v-for="post in respData.boardListByFilter" :key="post.postId">
           <td>{{ post.categoryName }}</td>
           <td>
             <i v-if="post.hasFiles" class="fas fa-paperclip"></i>
           </td>
-          <td><a href="#">{{ post.postTitle }}</a></td>
+          <td>
+            <router-link :to="{name: 'PostDetail', params:{ postId : post.postId } }">{{ post.postTitle }}</router-link>
+          </td>
           <td>{{ post.postWriter }}</td>
           <td>{{ post.postHits }}</td>
           <td>{{ post.uploadDatetime.replace('T',' ') }}</td>
@@ -53,7 +55,7 @@
 
       <ul>
         <li v-for="page in respData.pageVO.totalPage" :key="page" :class="{ active: page === respData.pageVO.currentPage }" @click="goToPage(page)">
-          <a href="#">{{ page }}</a>
+          <a>{{ page }}</a>
         </li>
       </ul>
 
@@ -158,12 +160,21 @@ export default {
     margin: 20px 5px;
   }
   .board-list table, .board-list th, .board-list td {
-    border: 1px solid black;
     border-collapse: collapse;
   }
+  .board-list table{
+    border-top: 1px solid #c1c1c1;
+  }
+  .board-list th{
+    border-bottom: 1px solid black;
+  }
+  .board-list td{
+    border-bottom: 1px solid #c1c1c1;
+  }
   .board-list td,.board-list th{
-    padding: 7px 20px;
+    padding: 7px 5px;
     text-align: center;
+    font-size: 15px;
   }
 
   .pagination li.active a {
