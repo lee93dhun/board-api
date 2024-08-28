@@ -3,7 +3,17 @@ module.exports = defineConfig({
   transpileDependencies: true,
   devServer:{
     port: 8080,
-    historyApiFallback: true
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
+    },
+    historyApiFallback: {
+      rewrites: [
+        { from:/./, to: '/board-api/index.html' },  
+      ],
+    },
   },
   publicPath:'/board-api/' 
 })
