@@ -4,20 +4,19 @@ import PostDetail from '../components/PostDetail.vue';
 
 const routes = [
 	{
-		path: '/board-api/list',
+		path: '/list',
 		name: 'BoardList',
 		component: BoardList
 	},
 	{
-		path: '/board-api/post/:postId',
+		path: '/post/:postId',
 		name: 'PostDetail',
 		component: PostDetail
 	}
 ];
 
 const router = createRouter({
-	history: createWebHistory(),
+	history: createWebHistory(process.env.BASE_URL),
 	routes,
 });
-
 export default router;

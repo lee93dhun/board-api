@@ -24,7 +24,7 @@
       </div>
     </div>
     <div class="comments">
-      <!-- comment component 호출 -->
+      <PostComments :comments="respData.comments" />
     </div>
     <div class="bottom-area">
       <button>목록</button>
@@ -38,9 +38,13 @@
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import { onMounted, reactive } from 'vue';
+import PostComments from './PostComments.vue';
 
   export default{
     name: 'PostDetail',
+    components:{
+      PostComments
+    },
     setup(){
       const route = useRoute();
       const postId = route.params.postId;
@@ -74,8 +78,7 @@ import { onMounted, reactive } from 'vue';
 
       onMounted(()=>{
         fetchData(postId);
-        console.log('onMounted >> ',postId)
-      })
+      });
 
       return{
         respData

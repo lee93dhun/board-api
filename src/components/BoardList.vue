@@ -3,14 +3,14 @@
     <h2>게시판 - 리스트</h2>
     <div class="search-filter">
       <label>등록일</label>
-      <input type="date" v-model="respData.boardFilterVO.startDate" name="startDate"/> - 
-      <input type="date" v-model="respData.boardFilterVO.endDate" name="endDate"/>
-      <select v-model="respData.boardFilterVO.category">
+      <input class="searchDate" type="date" v-model="respData.boardFilterVO.startDate" name="startDate"/> - 
+      <input class="searchDate" type="date" v-model="respData.boardFilterVO.endDate" name="endDate"/>
+      <select class="searchCategory" v-model="respData.boardFilterVO.category">
         <option :value="null">카테고리 선택</option>
         <option v-for="category in respData.categoryList" :key="category.categoryId" :value="category.categoryId">{{ category.categoryName }}</option>
       </select>
-      <input type="text" v-model="respData.boardFilterVO.keyword" name="keyword"/>
-      <button @click="searchPost">검색</button>
+      <input class="searchKeyword" type="text" v-model="respData.boardFilterVO.keyword" name="keyword"/>
+      <button class="searchBtn" @click="searchPost">검색</button>
     </div>
     <p>총 {{ respData.postCount }}건</p>
     <div class="board-list">
@@ -33,6 +33,9 @@
           <th>등록일시</th>
           <th>수정일시</th>
         </tr>
+        <tr v-if="respData.boardListByFilter.length == 0">
+          <td colspan="7">조건에 맞는 게시물이 없습니다.</td>
+        </tr>
         <tr v-for="post in respData.boardListByFilter" :key="post.postId">
           <td>{{ post.categoryName }}</td>
           <td>
@@ -49,8 +52,8 @@
       </table>
     </div>
     <div class="pagination">
-      <button @click="goToPage(respData.pageVO.currentPage - 1)" :disabled="respData.pageVO.currentPage === 1">
-        이전
+      <button class="page-btn" @click="goToPage(respData.pageVO.currentPage - 1)" :disabled="respData.pageVO.currentPage === 1">
+        <i class="fas fa-chevron-left"></i>
       </button>
 
       <ul>
@@ -59,11 +62,14 @@
         </li>
       </ul>
 
-      <button @click="goToPage(respData.pageVO.currentPage + 1)" :disabled="respData.pageVO.currentPage === respData.pageVO.totalPage">
-        다음
+      <button class="page-btn" @click="goToPage(respData.pageVO.currentPage + 1)" :disabled="respData.pageVO.currentPage === respData.pageVO.totalPage">
+        <i class="fas fa-chevron-right"></i>
       </button>
+     <!-- TODO 한번에 보여줄 pagenattion 범위 지정 , 범위 이동 버튼(기능) 생성 -->
+
     </div>
-    <button>등록</button>
+  
+    <button class="registerBtn">등록</button>
   </div>
 </template>
 
@@ -94,8 +100,10 @@ export default {
     const route = useRoute();
     const router = useRouter();
 
-    const fetchData = async ( queryParams  = {},page = respData.pageVO.currentPage) => {
+
+    const fetchData = async ( queryParams  = {},page = route.params.page) => {
       try{
+        console.log('fetchData() 실행');
         queryParams.page = page;
         const response = await axios.get("/list", {params: queryParams});
 
@@ -127,9 +135,9 @@ export default {
     const searchPost = () =>{
       const queryParams = buildQueryParams(respData.boardFilterVO,1);
 
-      router.push({path: 'list',query: queryParams});
+      router.push({path: '/list',query: queryParams});
 
-      fetchData(queryParams, 1);
+      fetchData(queryParams, queryParams.page);
     };
 
     const goToPage = (page) => {
@@ -156,6 +164,33 @@ export default {
 </script>
 
 <style>
+  .search-filter{
+    border: 1px solid black;
+    padding: 10px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .searchCategory{
+    height: 30px;
+  }
+  .searchDate, .searchKeyword{
+    height: 22px;
+  }
+  .search-filter input, .search-filter select{
+    margin: 0 10px;
+    padding: 2px 4px;
+  }
+  .searchDate, .searchCategory{
+    width: 150px;
+  }
+  .searchKeyword{
+    width: 250px;
+  }
+  .searchBtn{
+    width: 80px;
+    height: 30px;
+  }
   .board-list{
     margin: 20px 5px;
   }
@@ -164,6 +199,7 @@ export default {
   }
   .board-list table{
     border-top: 1px solid #c1c1c1;
+    width: 100%;
   }
   .board-list th{
     border-bottom: 1px solid black;
@@ -178,9 +214,9 @@ export default {
   }
 
   .pagination li.active a {
-  font-weight: bold;
-  color: red;
-  text-decoration: underline;
+    font-weight: bold;
+    color: red;
+    text-decoration: underline;
   }
   .pagination {
     display: flex;
@@ -207,5 +243,14 @@ export default {
   .pagination button:disabled {
     cursor: not-allowed;
     opacity: 0.5;
+  }
+  .page-btn{
+    background-color: transparent;
+    border: none;
+  }
+  .registerBtn{
+    float: right;
+    width: 80px;
+    height: 30px;
   }
 </style>

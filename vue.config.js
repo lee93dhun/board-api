@@ -3,7 +3,7 @@ module.exports = defineConfig({
   transpileDependencies: true,
   devServer:{
     port: 8080,
-    historyApiFallback: true, 
+    historyApiFallback: true
   },
   publicPath:'/board-api/' 
 })
