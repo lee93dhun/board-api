@@ -73,14 +73,11 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import axios from 'axios';
 import { onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-export default {
-  name: 'BoardList',
-  setup() {
     const respData = reactive({
       categoryList: [],
       postCount: 0,
@@ -154,13 +151,6 @@ export default {
     });
 
 
-    return{
-      respData,
-      searchPost,
-      goToPage
-    };
-  }
-};
 </script>
 
 <style>
