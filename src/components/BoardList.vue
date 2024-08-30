@@ -74,9 +74,9 @@
 </template>
 
 <script setup>
-import axios from 'axios';
 import { onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import  boardService  from '../service/BoardService';
 
     const reactiveDt = reactive({
       categoryList: [],
@@ -96,25 +96,12 @@ import { useRoute, useRouter } from 'vue-router';
 
     const route = useRoute();
     const router = useRouter();
-
-    const getBoardList = async ( queryParams = {}, page) => {
-      console.log('fetchData() 실행');
-      queryParams.page = page;
-
-      try{
-        const respData = await axios.get("/list", {params: queryParams});
-        reactiveDt.categoryList = respData.data.categoryList || [];
-        reactiveDt.postCount = respData.data.postCount || 0;
-        reactiveDt.boardFilterVO = respData.data.boardFilterVO || {};
-        reactiveDt.boardListByFilter = respData.data.boardListByFilter || {};
-        reactiveDt.pageVO = respData.data.pageVO || {
-          currentPage: 1, totalPage: 1
-        };
-      }catch(error){
-        console.log('데이터를 가져오는 오류 발생');
-      }
-    };
     
+    /**
+     * 값이 null이 아닌 query parameter만을 모은 객체 생성
+     * @param filterVO
+     * @param page 
+     */
     const buildQueryParams = (filterVO = reactiveDt.boardFilterVO, page) => {
       const queryParams = {};
 
@@ -133,22 +120,31 @@ import { useRoute, useRouter } from 'vue-router';
 
       router.push({path: '/list',query: queryParams});
 
-      getBoardList(queryParams, queryParams.page);
+      boardService.getBoardList(queryParams, queryParams.page)
+        .then( (data) =>  {
+          Object.assign(reactiveDt, data);
+        });
     };
 
     const goToPage = (page) => {
       const queryParams = buildQueryParams(reactiveDt.boardFilterVO, page);
 
       router.push({ path: 'list', query: queryParams });
-      getBoardList(queryParams, page);
+      boardService.getBoardList(queryParams, page)
+        .then( (data) =>  {
+          Object.assign(reactiveDt, data);
+        });
     };
 
     onMounted(() => {
       const initialQueryParams = route.query;
       console.log("initialQueryParams", initialQueryParams);
-      
+
       Object.assign(reactiveDt.boardFilterVO, initialQueryParams);
-      getBoardList(initialQueryParams, initialQueryParams.page);
+      boardService.getBoardList(initialQueryParams, initialQueryParams.page)
+        .then( (data) =>  {
+          Object.assign(reactiveDt, data);
+        });
     });
 
 
