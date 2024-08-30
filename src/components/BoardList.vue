@@ -3,16 +3,16 @@
     <h2>게시판 - 리스트</h2>
     <div class="search-filter">
       <label>등록일</label>
-      <input class="searchDate" type="date" v-model="respData.boardFilterVO.startDate" name="startDate"/> - 
-      <input class="searchDate" type="date" v-model="respData.boardFilterVO.endDate" name="endDate"/>
-      <select class="searchCategory" v-model="respData.boardFilterVO.category">
+      <input class="searchDate" type="date" v-model="reactiveDt.boardFilterVO.startDate" name="startDate"/> - 
+      <input class="searchDate" type="date" v-model="reactiveDt.boardFilterVO.endDate" name="endDate"/>
+      <select class="searchCategory" v-model="reactiveDt.boardFilterVO.category">
         <option :value="null">카테고리 선택</option>
-        <option v-for="category in respData.categoryList" :key="category.categoryId" :value="category.categoryId">{{ category.categoryName }}</option>
+        <option v-for="category in reactiveDt.categoryList" :key="category.categoryId" :value="category.categoryId">{{ category.categoryName }}</option>
       </select>
-      <input class="searchKeyword" type="text" v-model="respData.boardFilterVO.keyword" name="keyword"/>
+      <input class="searchKeyword" type="text" v-model="reactiveDt.boardFilterVO.keyword" name="keyword"/>
       <button class="searchBtn" @click="searchPost">검색</button>
     </div>
-    <p>총 {{ respData.postCount }}건</p>
+    <p>총 {{ reactiveDt.postCount }}건</p>
     <div class="board-list">
       <table>
         <colgroup>
@@ -33,10 +33,10 @@
           <th>등록일시</th>
           <th>수정일시</th>
         </tr>
-        <tr v-if="respData.boardListByFilter.length == 0">
+        <tr v-if="reactiveDt.boardListByFilter.length == 0">
           <td colspan="7">조건에 맞는 게시물이 없습니다.</td>
         </tr>
-        <tr v-for="post in respData.boardListByFilter" :key="post.postId">
+        <tr v-for="post in reactiveDt.boardListByFilter" :key="post.postId">
           <td>{{ post.categoryName }}</td>
           <td>
             <i v-if="post.hasFiles" class="fas fa-paperclip"></i>
@@ -52,17 +52,17 @@
       </table>
     </div>
     <div class="pagination">
-      <button class="page-btn" @click="goToPage(respData.pageVO.currentPage - 1)" :disabled="respData.pageVO.currentPage === 1">
+      <button class="page-btn" @click="goToPage(reactiveDt.pageVO.currentPage - 1)" :disabled="reactiveDt.pageVO.currentPage === 1">
         <i class="fas fa-chevron-left"></i>
       </button>
 
       <ul>
-        <li v-for="page in respData.pageVO.totalPage" :key="page" :class="{ active: page === respData.pageVO.currentPage }" @click="goToPage(page)">
+        <li v-for="page in reactiveDt.pageVO.totalPage" :key="page" :class="{ active: page === reactiveDt.pageVO.currentPage }" @click="goToPage(page)">
           <a>{{ page }}</a>
         </li>
       </ul>
 
-      <button class="page-btn" @click="goToPage(respData.pageVO.currentPage + 1)" :disabled="respData.pageVO.currentPage === respData.pageVO.totalPage">
+      <button class="page-btn" @click="goToPage(reactiveDt.pageVO.currentPage + 1)" :disabled="reactiveDt.pageVO.currentPage === reactiveDt.pageVO.totalPage">
         <i class="fas fa-chevron-right"></i>
       </button>
      <!-- TODO 한번에 보여줄 pagenattion 범위 지정 , 범위 이동 버튼(기능) 생성 -->
@@ -78,7 +78,7 @@ import axios from 'axios';
 import { onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-    const respData = reactive({
+    const reactiveDt = reactive({
       categoryList: [],
       postCount: 0,
       boardFilterVO: {
@@ -97,18 +97,17 @@ import { useRoute, useRouter } from 'vue-router';
     const route = useRoute();
     const router = useRouter();
 
+    const getBoardList = async ( queryParams = {}, page) => {
+      console.log('fetchData() 실행');
+      queryParams.page = page;
 
-    const fetchData = async ( queryParams  = {},page = route.params.page) => {
       try{
-        console.log('fetchData() 실행');
-        queryParams.page = page;
-        const response = await axios.get("/list", {params: queryParams});
-
-        respData.categoryList = response.data.categoryList || [];
-        respData.postCount = response.data.postCount || 0;
-        respData.boardFilterVO = response.data.boardFilterVO || {};
-        respData.boardListByFilter = response.data.boardListByFilter || {};
-        respData.pageVO = response.data.pageVO || {
+        const respData = await axios.get("/list", {params: queryParams});
+        reactiveDt.categoryList = respData.data.categoryList || [];
+        reactiveDt.postCount = respData.data.postCount || 0;
+        reactiveDt.boardFilterVO = respData.data.boardFilterVO || {};
+        reactiveDt.boardListByFilter = respData.data.boardListByFilter || {};
+        reactiveDt.pageVO = respData.data.pageVO || {
           currentPage: 1, totalPage: 1
         };
       }catch(error){
@@ -116,7 +115,7 @@ import { useRoute, useRouter } from 'vue-router';
       }
     };
     
-    const buildQueryParams = (filterVO, page) => {
+    const buildQueryParams = (filterVO = reactiveDt.boardFilterVO, page) => {
       const queryParams = {};
 
       if (filterVO.startDate) queryParams.startDate = filterVO.startDate;
@@ -130,24 +129,26 @@ import { useRoute, useRouter } from 'vue-router';
     };
 
     const searchPost = () =>{
-      const queryParams = buildQueryParams(respData.boardFilterVO,1);
+      const queryParams = buildQueryParams(reactiveDt.boardFilterVO, 1);
 
       router.push({path: '/list',query: queryParams});
 
-      fetchData(queryParams, queryParams.page);
+      getBoardList(queryParams, queryParams.page);
     };
 
     const goToPage = (page) => {
-      const queryParams = buildQueryParams(respData.boardFilterVO, page);
+      const queryParams = buildQueryParams(reactiveDt.boardFilterVO, page);
 
       router.push({ path: 'list', query: queryParams });
-      fetchData(queryParams, page);
+      getBoardList(queryParams, page);
     };
 
     onMounted(() => {
       const initialQueryParams = route.query;
-      Object.assign(respData.boardFilterVO, initialQueryParams);
-      fetchData(initialQueryParams, respData.pageVO.currentPage);
+      console.log("initialQueryParams", initialQueryParams);
+      
+      Object.assign(reactiveDt.boardFilterVO, initialQueryParams);
+      getBoardList(initialQueryParams, initialQueryParams.page);
     });
 
 
