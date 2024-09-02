@@ -4,23 +4,13 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { useRouter}from 'vue-router';
-  export default {
-    name: 'HeaderComponent',
-    setup(){
 
-      const router = useRouter();
+  const router = useRouter();
 
-      const showBoardList = () => {
-        console.log('click event');
-        router.push('/list')
-      }
-      
-      return {
-        showBoardList
-      }
-    } 
+  const showBoardList = () => {
+    router.push('/list')
   }
 </script>
 

@@ -12,40 +12,33 @@
   </div>
 </template>
 
-<script>
-import { ref } from 'vue';
+<script setup>
+import ref from 'vue';
 
-export default {
-  name: 'PostComments', 
-  props: {
-    comments: {
-      type: Array,
-      required: true
-    }
-  },
-  setup(props, { emit }) {
-    const newWriter = ref(''); 
-    const newCommentContent = ref(''); 
-
-    const submitComment = () => {
-      if (newWriter.value.trim() && newCommentContent.value.trim()) {
-        const newComment = {
-          commentWriter: newWriter.value,
-          commentContent: newCommentContent.value,
-        };
-
-        emit('add-comment', newComment);
-
-        newWriter.value = '';
-        newCommentContent.value = '';
-      }
-    };
-
-    return {
-      newWriter,
-      newCommentContent,
-      submitComment
-    };
+const props = defineProps({
+  comments: {
+    type: Array,
+    required: true
   }
+});
+
+const emit = defineEmits(['add-comment']);
+const newWriter = ref(''); 
+const newCommentContent = ref(''); 
+
+const submitComment = () => {
+  console.log('submit comment action');
+  // if (newWriter.value.trim() && newCommentContent.value.trim()) {
+  //   const newComment = {
+  //     commentWriter: newWriter.value,
+  //     commentContent: newCommentContent.value,
+  //   };
+
+  //   emit('add-comment', newComment);
+
+  //   newWriter.value = '';
+  //   newCommentContent.value = '';
+  // }
 };
+
 </script>

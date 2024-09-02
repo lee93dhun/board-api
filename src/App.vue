@@ -1,17 +1,17 @@
 <template>
   <div id="app">
-    <header-component></header-component>
+    <header-section></header-section>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-import HeaderComponent from './components/Header.vue';
+import HeaderSection from './components/HeaderSection.vue';
 
 export default {
   name: 'App',
   components:{
-    HeaderComponent
+    HeaderSection
   }
 }
 </script>

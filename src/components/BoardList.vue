@@ -74,78 +74,85 @@
 </template>
 
 <script setup>
+
+
 import { onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import  boardService  from '../service/BoardService';
 
-    const reactiveDt = reactive({
-      categoryList: [],
-      postCount: 0,
-      boardFilterVO: {
-        startDate: '',
-        endDate: '',
-        category: '',
-        keyword: ''
-      },
-      boardListByFilter: [],
-      pageVO: {
-        currentPage: 1,
-        totalPage: 1
-      }
+const reactiveDt = reactive({
+  categoryList: [],
+  postCount: 0,
+  boardFilterVO: {
+    startDate: '',
+    endDate: '',
+    category: '',
+    keyword: ''
+  },
+  boardListByFilter: [],
+  pageVO: {
+    currentPage: 1,
+    totalPage: 1
+  }
+});
+
+const route = useRoute();
+const router = useRouter();
+
+/**
+ * 값이 null이 아닌 query parameter만을 모은 객체 생성
+ * @param filterVO 검색 조건으로 쓰일 반응형 데이터
+ * @param page 가져올 Board List의 page 숫자 
+ */
+const buildQueryParams = (filterVO = reactiveDt.boardFilterVO, page) => {
+  const queryParams = {};
+
+  if (filterVO.startDate) queryParams.startDate = filterVO.startDate;
+  if (filterVO.endDate) queryParams.endDate = filterVO.endDate;
+  if (filterVO.category) queryParams.category = filterVO.category;
+  if (filterVO.keyword) queryParams.keyword = filterVO.keyword;
+  queryParams.page = page;
+
+  return queryParams;
+};
+
+/**
+ * 조건에 따른 게시물 리스트 요청
+ */
+const searchPost = () =>{
+  const queryParams = buildQueryParams(reactiveDt.boardFilterVO, 1);
+
+  router.push({path: '/list',query: queryParams});
+
+  boardService.getBoardList(queryParams, queryParams.page)
+    .then( (data) => {
+      Object.assign(reactiveDt, data);
     });
+};
 
-    const route = useRoute();
-    const router = useRouter();
-    
-    /**
-     * 값이 null이 아닌 query parameter만을 모은 객체 생성
-     * @param filterVO
-     * @param page 
-     */
-    const buildQueryParams = (filterVO = reactiveDt.boardFilterVO, page) => {
-      const queryParams = {};
+/**
+ * 페이지 숫자에 해당하는 게시물 리스트 요청
+ */
+const goToPage = (page) => {
+  const queryParams = buildQueryParams(reactiveDt.boardFilterVO, page);
 
-      if (filterVO.startDate) queryParams.startDate = filterVO.startDate;
-      if (filterVO.endDate) queryParams.endDate = filterVO.endDate;
-      if (filterVO.category) queryParams.category = filterVO.category;
-      if (filterVO.keyword) queryParams.keyword = filterVO.keyword;
-
-      queryParams.page = page;
-
-      return queryParams;
-    };
-
-    const searchPost = () =>{
-      const queryParams = buildQueryParams(reactiveDt.boardFilterVO, 1);
-
-      router.push({path: '/list',query: queryParams});
-
-      boardService.getBoardList(queryParams, queryParams.page)
-        .then( (data) =>  {
-          Object.assign(reactiveDt, data);
-        });
-    };
-
-    const goToPage = (page) => {
-      const queryParams = buildQueryParams(reactiveDt.boardFilterVO, page);
-
-      router.push({ path: 'list', query: queryParams });
-      boardService.getBoardList(queryParams, page)
-        .then( (data) =>  {
-          Object.assign(reactiveDt, data);
-        });
-    };
-
-    onMounted(() => {
-      const initialQueryParams = route.query;
-      console.log("initialQueryParams", initialQueryParams);
-
-      Object.assign(reactiveDt.boardFilterVO, initialQueryParams);
-      boardService.getBoardList(initialQueryParams, initialQueryParams.page)
-        .then( (data) =>  {
-          Object.assign(reactiveDt, data);
-        });
+  router.push({ path: 'list', query: queryParams });
+  boardService.getBoardList(queryParams, page)
+    .then( (data) =>  {
+      Object.assign(reactiveDt, data);
     });
+};
+
+onMounted(() => {
+  const initialQueryParams = route.query;
+  console.log("initialQueryParams", initialQueryParams);
+
+  Object.assign(reactiveDt.boardFilterVO, initialQueryParams);
+  boardService.getBoardList(initialQueryParams, initialQueryParams.page)
+    .then( (data) =>  {
+      Object.assign(reactiveDt, data);
+    });
+});
 
 
 </script>
